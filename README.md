@@ -82,9 +82,14 @@ Use the UI to manage customers, services, and bookings.
 The project uses Maven dependencies such as:
 
 spring-boot-starter-web
+
 spring-boot-starter-data-jpa
+
 mysql-connector-java
+
 spring-boot-devtools (optional for hot reload)
+
 thymeleaf (if used for HTML templates)
+
 git clone https://github.com/your-username/salon-booking.git
 cd salon-booking
