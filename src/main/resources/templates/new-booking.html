@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Booking - Lovely Salon</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #fdfaf5;
+            --surface: #ffffff;
+            --accent: #4a8c7d;
+            --accent-dark: #3a6f63;
+            --text: #4a4a4a;
+            --text-light: #6b7280;
+            --border: #f0e9df;
+            --shadow-soft: 0 10px 30px rgba(0,0,0,0.05);
+        }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); }
+        .navbar { background: var(--surface) !important; border-bottom: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.04); }
+        .navbar-brand { font-weight: 700; color: var(--accent-dark) !important; font-size: 1.7rem; }
+        .nav-link { color: var(--text-light) !important; font-weight: 500; padding: 0.75rem 1.5rem !important; border-radius: 999px; transition: all 0.3s ease; }
+        .nav-link:hover, .nav-link.active { color: var(--accent-dark) !important; background: #f5e9d9; }
+        .page-header { padding: 6rem 0 4rem; background: linear-gradient(rgba(74,140,125,0.12), rgba(245,233,217,0.18)), url('https://images.unsplash.com/photo1515378960530-7c0da6231fb1?auto=format&fit=crop&q=80') center/cover; color: var(--accent-dark); text-align: center; position: relative; }
+        .page-header::before { content: ''; position: absolute; inset: 0; background: rgba(253,250,245,0.7); }
+        .page-header h1, .page-header p { position: relative; }
+        .page-header h1 { font-weight: 700; font-size: 3.2rem; }
+        .form-container { background: var(--surface); border-radius: 24px; padding: 2rem 3rem; box-shadow: var(--shadow-soft); border: 1px solid var(--border); max-width: 600px; margin: -80px auto 50px; }
+        .form-label { font-weight: 500; }
+        .btn-primary { background: var(--accent); border: none; border-radius: 999px; padding: 0.6rem 1.5rem; font-weight: 600; transition: all 0.35s ease; }
+        .btn-primary:hover { background: var(--accent-dark); transform: translateY(-3px); box-shadow: 0 10px 25px rgba(74,140,125,0.25); }
+        .btn-outline-secondary { border-radius: 999px; }
+        select.form-select, input.form-control, textarea.form-control { border-radius: 12px; border: 1px solid var(--border); }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="/"><i class="fas fa-leaf me-2"></i> Lovely Salon</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/services">Services</a></li>
+                <li class="nav-item"><a class="nav-link active" href="/bookings">Bookings</a></li>
+                <li class="nav-item"><a class="nav-link" href="/customers">Customers</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-calendar-plus me-3"></i> New Booking</h1>
+        <p>Schedule a new appointment</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="form-container">
+        <form id="bookingForm">
+            <div class="mb-3">
+                <label class="form-label">Customer</label>
+                <select class="form-select" id="customerId" required>
+                    <option value="">Select Customer</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Service</label>
+                <select class="form-select" id="serviceId" required>
+                    <option value="">Select Service</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Appointment Date & Time</label>
+                <input type="datetime-local" class="form-control" id="bookingDateTime" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Notes (Optional)</label>
+                <textarea class="form-control" id="notes" rows="3"></textarea>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg">Create Booking</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="resetForm()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const API_BOOKINGS = "http://localhost:8080/api/bookings";
+const API_CUSTOMERS = "http://localhost:8080/api/customers";
+const API_SERVICES = "http://localhost:8080/api/services";
+
+// Load customers
+async function loadCustomers() {
+    try {
+        const res = await fetch(API_CUSTOMERS);
+        const customers = await res.json();
+        const select = document.getElementById('customerId');
+        customers.forEach(c => select.innerHTML += `<option value="${c.customerId}">${c.name} (${c.email})</option>`);
+    } catch(err) {
+        console.error("Failed to load customers:", err);
+    }
+}
+
+// Load services
+async function loadServices() {
+    try {
+        const res = await fetch(API_SERVICES);
+        const services = await res.json();
+        const select = document.getElementById('serviceId');
+        services.forEach(s => select.innerHTML += `<option value="${s.serviceId}">${s.serviceName} - $${s.price}</option>`);
+    } catch(err) {
+        console.error("Failed to load services:", err);
+    }
+}
+
+// Set minimum date-time to now
+function setMinDateTime() {
+    const now = new Date();
+    const localISO = now.toISOString().slice(0,16); // "YYYY-MM-DDTHH:mm"
+    document.getElementById('bookingDateTime').min = localISO;
+}
+
+// Submit booking
+async function submitBooking(e) {
+    e.preventDefault();
+
+    const customerId = document.getElementById('customerId').value;
+    const serviceId = document.getElementById('serviceId').value;
+    const bookingDateTime = document.getElementById('bookingDateTime').value;
+
+    if (!customerId || !serviceId || !bookingDateTime) {
+        alert("Please fill all required fields.");
+        return;
+    }
+
+    const bookingData = {
+        customer: { customerId: parseInt(customerId) },
+        service: { serviceId: parseInt(serviceId) },
+        bookingDateTime,
+        notes: document.getElementById('notes').value,
+        status: "PENDING"
+    };
+
+    try {
+        const res = await fetch(API_BOOKINGS, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bookingData)
+        });
+
+        if (res.ok) {
+            alert("Booking created successfully!");
+            window.location.href = "/bookings"; // redirect to bookings page
+        } else {
+            const errorText = await res.text();
+            alert("Failed to create booking: " + errorText);
+        }
+    } catch(err) {
+        console.error(err);
+        alert("Error connecting to server.");
+    }
+}
+
+function resetForm() {
+    document.getElementById('bookingForm').reset();
+}
+
+window.onload = function() {
+    loadCustomers();
+    loadServices();
+    setMinDateTime();
+    document.getElementById('bookingForm').addEventListener('submit', submitBooking);
+};
+</script>
+
+</body>
+</html>
