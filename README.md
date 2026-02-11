@@ -71,11 +71,11 @@ spring.jpa.show-sql=true
 
 ## Run the Application
 
-Right-click the project → Run As → Spring Boot App.
-The server will start at: http://localhost:8080.
-Access the Application
-Open your browser and navigate to http://localhost:8080.
-Use the UI to manage customers, services, and bookings.
+- Right-click the project → Run As → Spring Boot App.
+- The server will start at: http://localhost:8080.
+- Access the Application
+- Open your browser and navigate to http://localhost:8080.
+- Use the UI to manage customers, services, and bookings.
 
 ## Dependencies
 
